@@ -44,8 +44,67 @@ const getIncidents = async function (req, res) {
   }
 };
 
+const updateIncident = async function (req, res) {
+  try {
+    const incidentId = req.params.id;
+    const { status, priority } = req.body;
+
+    // if (!status || !priority) {
+    //   return res
+    //     .status(400)
+    //     .json({ message: "Priority and Status are only allowed to update." });
+    // }
+
+    const incidentToUpdate = await Incident.findByIdAndUpdate(
+      incidentId,
+      { status, priority },
+      { returnDocument: "after", runValidator: true },
+    );
+
+    if (!incidentToUpdate) {
+      return res.status(404).json({ message: "Incident not exists!" });
+    }
+
+    res.status(200).json({
+      message: "Incident update successfully!",
+      Incident: incidentToUpdate,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Internal server Error in updating Incident",
+      Error: error,
+    });
+  }
+};
+
+const deleteIncident = async function (req, res) {
+  try {
+    const incidentId = req.params.id;
+
+    const deletedIncident = await Incident.findByIdAndDelete(incidentId);
+
+    if (!deletedIncident) {
+      return res
+        .status(404)
+        .json({ message: "Incident not found to be deleted." });
+    }
+
+    res.status(200).json({
+      message: "Incident deleted Successfully",
+      Incident: deletedIncident,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Internal server Error in deleting Incident",
+      Error: err,
+    });
+  }
+};
+
 const incidentController = {
   createIncident,
   getIncidents,
+  updateIncident,
+  deleteIncident,
 };
 export default incidentController;
