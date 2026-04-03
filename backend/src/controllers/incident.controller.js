@@ -24,7 +24,7 @@ const createIncident = async function (req, res) {
     });
 
     res.status(201).json({
-      message: "New incident is created",
+      message: "A New incident is reported.",
       newIncident: newIncident,
     });
   } catch (err) {
@@ -73,7 +73,7 @@ const updateIncident = async function (req, res) {
 
     const io = req.app.get("io");
     io.emit("incidentUpdated", {
-      message: "A new incident is updated.",
+      message: "A incident is updated.",
       Incident: incidentToUpdate,
     });
 
@@ -102,8 +102,8 @@ const deleteIncident = async function (req, res) {
     }
 
     const io = req.app.get("io");
-    io.emit("incidentCreated", {
-      message: "A new incident is reported.",
+    io.emit("incidentDeleted", {
+      message: "A incident is deleted.",
       Incident: deleteIncident,
     });
 
