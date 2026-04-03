@@ -17,6 +17,12 @@ const createIncident = async function (req, res) {
       location,
     });
 
+    const io = req.app.get("io");
+    io.emit("incidentCreated", {
+      message: "A new incident is reported.",
+      Incident: newIncident,
+    });
+
     res.status(201).json({
       message: "New incident is created",
       newIncident: newIncident,
@@ -65,6 +71,12 @@ const updateIncident = async function (req, res) {
       return res.status(404).json({ message: "Incident not exists!" });
     }
 
+    const io = req.app.get("io");
+    io.emit("incidentUpdated", {
+      message: "A new incident is updated.",
+      Incident: incidentToUpdate,
+    });
+
     res.status(200).json({
       message: "Incident update successfully!",
       Incident: incidentToUpdate,
@@ -88,6 +100,12 @@ const deleteIncident = async function (req, res) {
         .status(404)
         .json({ message: "Incident not found to be deleted." });
     }
+
+    const io = req.app.get("io");
+    io.emit("incidentCreated", {
+      message: "A new incident is reported.",
+      Incident: deleteIncident,
+    });
 
     res.status(200).json({
       message: "Incident deleted Successfully",
