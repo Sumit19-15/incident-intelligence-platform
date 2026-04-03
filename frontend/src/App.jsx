@@ -10,8 +10,7 @@ function App() {
         const res = await fetch("http://localhost:5000/api/incidents");
         const data = await res.json();
 
-        console.log(data.Incidents);
-        setIncidents(data.Incidents);
+        setIncidents(data.incidents);
       } catch (error) {
         console.error("Error fetching incidents:", error);
       }
@@ -22,15 +21,23 @@ function App() {
 
   useEffect(() => {
     socket.on("incidentCreated", (newIncident) => {
-      console.log("Created:", newIncident);
+      setIncidents((prev) => {
+        return [newIncident, ...prev];
+      });
     });
 
     socket.on("incidentUpdated", (updatedIncident) => {
-      console.log("Updated:", updatedIncident);
+      setIncidents((prev) =>
+        prev.map((item) =>
+          item._id === updatedIncident._id ? updatedIncident : item,
+        ),
+      );
     });
 
     socket.on("incidentDeleted", (deletedIncident) => {
-      console.log("Deleted:", deletedIncident);
+      setIncidents((prev) =>
+        prev.filter((item) => item._id !== deletedIncident._id),
+      );
     });
 
     return () => {

@@ -18,14 +18,11 @@ const createIncident = async function (req, res) {
     });
 
     const io = req.app.get("io");
-    io.emit("incidentCreated", {
-      message: "A new incident is reported.",
-      Incident: newIncident,
-    });
+    io.emit("incidentCreated", newIncident);
 
     res.status(201).json({
       message: "A New incident is reported.",
-      newIncident: newIncident,
+      incident: newIncident,
     });
   } catch (err) {
     res
@@ -43,7 +40,7 @@ const getIncidents = async function (req, res) {
     });
     res.status(200).json({
       message: "Incidents fetched successfully",
-      Incidents: sortedIncidents,
+      incidents: sortedIncidents,
     });
   } catch (error) {
     res.status(500).json({ message: "Error in getting all incidents" });
@@ -72,14 +69,11 @@ const updateIncident = async function (req, res) {
     }
 
     const io = req.app.get("io");
-    io.emit("incidentUpdated", {
-      message: "A incident is updated.",
-      Incident: incidentToUpdate,
-    });
+    io.emit("incidentUpdated", incidentToUpdate);
 
     res.status(200).json({
       message: "Incident update successfully!",
-      Incident: incidentToUpdate,
+      incident: incidentToUpdate,
     });
   } catch (error) {
     res.status(500).json({
@@ -102,14 +96,11 @@ const deleteIncident = async function (req, res) {
     }
 
     const io = req.app.get("io");
-    io.emit("incidentDeleted", {
-      message: "A incident is deleted.",
-      Incident: deleteIncident,
-    });
+    io.emit("incidentDeleted", deletedIncident);
 
     res.status(200).json({
       message: "Incident deleted Successfully",
-      Incident: deletedIncident,
+      incident: deletedIncident,
     });
   } catch (err) {
     res.status(500).json({
