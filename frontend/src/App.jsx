@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import socket from "./socket.js";
+
 function App() {
   const [incidents, setIncidents] = useState([]);
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [priorityFilter, setPriorityFilter] = useState("All");
 
   useEffect(() => {
     const getAllIncidents = async () => {
       try {
         const res = await fetch("http://localhost:5000/api/incidents");
         const data = await res.json();
-
         setIncidents(data.incidents);
       } catch (error) {
         console.error("Error fetching incidents:", error);
@@ -21,9 +22,7 @@ function App() {
 
   useEffect(() => {
     socket.on("incidentCreated", (newIncident) => {
-      setIncidents((prev) => {
-        return [newIncident, ...prev];
-      });
+      setIncidents((prev) => [newIncident, ...prev]);
     });
 
     socket.on("incidentUpdated", (updatedIncident) => {
@@ -47,16 +46,50 @@ function App() {
     };
   }, []);
 
+  const handleStatusFilter = (e) => {
+    setStatusFilter(e.target.value);
+  };
+
+  const handlePriorityFilter = (e) => {
+    setPriorityFilter(e.target.value);
+  };
+
+  const filteredIncidents = incidents.filter((item) => {
+    const statusMatch = statusFilter === "All" || item.status === statusFilter;
+
+    const priorityMatch =
+      priorityFilter === "All" || item.priority === priorityFilter;
+
+    return statusMatch && priorityMatch;
+  });
+
   return (
     <div style={{ padding: "20px" }}>
       <h2>Incidents</h2>
 
-      {incidents.length === 0 ? (
+      <div style={{ marginBottom: "10px" }}>
+        {/* Status Filter */}
+        <select value={statusFilter} onChange={handleStatusFilter}>
+          <option value="All">All Status</option>
+          <option value="active">Active</option>
+          <option value="resolved">Resolved</option>
+        </select>
+
+        {/* Priority Filter */}
+        <select value={priorityFilter} onChange={handlePriorityFilter}>
+          <option value="All">All Priority</option>
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
+      </div>
+
+      {filteredIncidents.length === 0 ? (
         <p>No incidents found</p>
       ) : (
-        incidents.map((incident) => (
+        filteredIncidents.map((incident, index) => (
           <div
-            key={incident._id}
+            key={incident._id || index}
             style={{
               border: "1px solid #ccc",
               marginBottom: "10px",
