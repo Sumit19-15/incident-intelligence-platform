@@ -12,6 +12,7 @@ function IncidentForm() {
   });
 
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handelInputChange = (event) => {
     const { name, value } = event.target;
@@ -23,6 +24,7 @@ function IncidentForm() {
 
   const handelFormSubmit = async (event) => {
     event.preventDefault();
+    if (loading) return;
 
     if (
       !formData.title ||
@@ -47,6 +49,7 @@ function IncidentForm() {
     }
 
     setError("");
+    setLoading(true);
 
     try {
       const requestBody = {
@@ -79,17 +82,24 @@ function IncidentForm() {
         error.response?.data || error.message,
       );
       setError("Failed to submit incident");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex item-center justify-center bg-gray-100 p-15 pb-40">
-      <div className="bg-white p-6  rounded-2xl shadow-md w-full max-w-xl">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-6 rounded-2xl shadow-md w-full max-w-xl">
         {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
         <h2 className="text-xl font-semibold mb-4">Report Incident</h2>
         <form onSubmit={handelFormSubmit}>
-          <div className="mb-4 w-full border border-gray-300 rounded-lg px-3 py-2 mt-1">
-            <label htmlFor="incidentForm-title">Title</label>
+          <div className="mb-4">
+            <label
+              className="block text-md font-medium text-gray-700"
+              htmlFor="incidentForm-title"
+            >
+              Title
+            </label>
             <input
               type="text"
               name="title"
@@ -101,19 +111,25 @@ function IncidentForm() {
             />
           </div>
 
-          <div className="mb-4 w-full border border-gray-300 rounded-lg px-3 py-2 mt-1">
-            <label htmlFor="incidentForm-description">Description</label>
+          <div className="mb-4">
+            <label
+              className="block text-md font-medium text-gray-700"
+              htmlFor="incidentForm-description"
+            >
+              Description
+            </label>
             <input
-              type="text"
+              type="textarea"
               value={formData.description}
               onChange={handelInputChange}
               placeholder="Description"
               name="description"
+              id="incidentForm-description"
               className="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
-          <div className="mb-4 w-full border border-gray-300 rounded-lg px-3 py-2 mt-1">
+          <div className="mb-4 ">
             <select
               id="incidentForm-type"
               name="type"
@@ -128,7 +144,7 @@ function IncidentForm() {
             </select>
           </div>
 
-          <div className="mb-4 w-full border border-gray-300 rounded-lg px-3 py-2 mt-1">
+          <div className="mb-4">
             <select
               id="incidentForm-priority"
               name="priority"
@@ -136,14 +152,13 @@ function IncidentForm() {
               onChange={handelInputChange}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="">Select Priority</option>
               <option value="low">Low</option>
               <option value="medium">Medium</option>
               <option value="high">High</option>
             </select>
           </div>
 
-          <div className=" flex gap-2 mb-4 w-full border border-gray-300 rounded-lg px-3 py-2 mt-1">
+          <div className=" flex gap-2 mb-4 ">
             <input
               name="lat"
               type="number"
@@ -166,9 +181,10 @@ function IncidentForm() {
           <div className="pt-3">
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white text-xl py-2 rounded-lg hover:bg-blue-700 transition"
+              disabled={loading}
+              className="w-full bg-blue-600 text-white text-xl py-2 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Submit
+              {loading ? "Submitting..." : "Submit"}
             </button>
           </div>
         </form>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import socket from "./socket.js";
+import socket from "./lib/socket.js";
 import axiosInstance from "./lib/axios.config.js";
-
+import { dbStore } from "./lib/db.js";
 function App() {
   const [incidents, setIncidents] = useState([]);
   const [statusFilter, setStatusFilter] = useState("All");
@@ -103,6 +103,15 @@ function App() {
           </div>
         ))
       )}
+
+      <div>
+        <button
+          onClick={dbStore}
+          className="bg-purple-600 text-white p-2 rounded mb-4"
+        >
+          Seed DB
+        </button>
+      </div>
     </div>
   );
 }
