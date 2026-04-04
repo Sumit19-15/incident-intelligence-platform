@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import socket from "./socket.js";
+import axiosInstance from "./lib/axios.config.js";
 
 function App() {
   const [incidents, setIncidents] = useState([]);
@@ -9,8 +10,8 @@ function App() {
   useEffect(() => {
     const getAllIncidents = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/incidents");
-        const data = await res.json();
+        const res = await axiosInstance.get("/incidents");
+        const data = res.data;
         setIncidents(data.incidents);
       } catch (error) {
         console.error("Error fetching incidents:", error);
@@ -65,7 +66,7 @@ function App() {
 
   return (
     <div style={{ padding: "20px" }}>
-      <h2>Incidents</h2>
+      <h2 className="">Incidents</h2>
 
       <div style={{ marginBottom: "10px" }}>
         {/* Status Filter */}

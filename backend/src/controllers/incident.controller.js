@@ -2,12 +2,19 @@ import Incident from "../models/incident.model.js";
 
 const createIncident = async function (req, res) {
   try {
-    const { title, description, type, location } = req.body;
+    const { title, description, type, location, priority } = req.body;
 
-    if (!title || !description || !type || !location.lat || !location.lng) {
+    if (
+      !title ||
+      !description ||
+      !type ||
+      !location.lat ||
+      !location.lng ||
+      !priority
+    ) {
       return res
         .status(400)
-        .json({ message: "All Required fields are necessary" });
+        .json({ message: "All Required fields are necessary." });
     }
 
     const newIncident = await Incident.create({
@@ -15,6 +22,7 @@ const createIncident = async function (req, res) {
       description,
       type,
       location,
+      priority,
     });
 
     const io = req.app.get("io");
