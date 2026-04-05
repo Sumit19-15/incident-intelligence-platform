@@ -49,7 +49,7 @@ export const registerUser = async (req, res) => {
         name: newUser.name,
         email: newUser.email,
       },
-      token: token,
+      token,
     });
   } catch (error) {
     res.status(500).json({
@@ -94,11 +94,11 @@ export const loginUser = async function (req, res) {
 
     res.status(200).json({
       message: "Logged in.",
-      status: "success",
+      success: true,
       user: {
         _id: user._id,
         name: user.name,
-        email: user._email,
+        email: user.email,
       },
       token: token,
     });
@@ -109,9 +109,15 @@ export const loginUser = async function (req, res) {
   }
 };
 
+export const logoutUser = async function (req, res) {
+  res.cookie("token", "", { maxAge: 0 });
+  res.status(200).json({ message: "Logout successfully", success: true });
+};
+
 const authController = {
   registerUser,
   loginUser,
+  logoutUser,
 };
 
 export default authController;

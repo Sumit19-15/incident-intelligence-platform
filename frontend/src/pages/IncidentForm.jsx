@@ -63,7 +63,7 @@ function IncidentForm() {
         priority: formData.priority,
       };
 
-      const res = await axiosInstance.post("/incidents", requestBody);
+      const res = await axiosInstance.post("/incidents/report", requestBody);
       console.log(res.data.message);
 
       alert("New incident is reported.");

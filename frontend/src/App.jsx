@@ -1,117 +1,30 @@
-import { useState, useEffect } from "react";
-import socket from "./lib/socket.js";
-import axiosInstance from "./lib/axios.config.js";
-import { dbStore } from "./lib/db.js";
+import React from "react";
+import { Navigate, Routes, Route } from "react-router";
+import Home from "./Home";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import ProtectedRoute from "./pages/ProtectedRoute";
+import IncidentForm from "./pages/IncidentForm";
+
 function App() {
-  const [incidents, setIncidents] = useState([]);
-  const [statusFilter, setStatusFilter] = useState("All");
-  const [priorityFilter, setPriorityFilter] = useState("All");
-
-  useEffect(() => {
-    const getAllIncidents = async () => {
-      try {
-        const res = await axiosInstance.get("/incidents");
-        const data = res.data;
-        setIncidents(data.incidents);
-      } catch (error) {
-        console.error("Error fetching incidents:", error);
-      }
-    };
-
-    getAllIncidents();
-  }, []);
-
-  useEffect(() => {
-    socket.on("incidentCreated", (newIncident) => {
-      setIncidents((prev) => [newIncident, ...prev]);
-    });
-
-    socket.on("incidentUpdated", (updatedIncident) => {
-      setIncidents((prev) =>
-        prev.map((item) =>
-          item._id === updatedIncident._id ? updatedIncident : item,
-        ),
-      );
-    });
-
-    socket.on("incidentDeleted", (deletedIncident) => {
-      setIncidents((prev) =>
-        prev.filter((item) => item._id !== deletedIncident._id),
-      );
-    });
-
-    return () => {
-      socket.off("incidentCreated");
-      socket.off("incidentUpdated");
-      socket.off("incidentDeleted");
-    };
-  }, []);
-
-  const handleStatusFilter = (e) => {
-    setStatusFilter(e.target.value);
-  };
-
-  const handlePriorityFilter = (e) => {
-    setPriorityFilter(e.target.value);
-  };
-
-  const filteredIncidents = incidents.filter((item) => {
-    const statusMatch = statusFilter === "All" || item.status === statusFilter;
-
-    const priorityMatch =
-      priorityFilter === "All" || item.priority === priorityFilter;
-
-    return statusMatch && priorityMatch;
-  });
-
   return (
-    <div style={{ padding: "20px" }}>
-      <h2 className="">Incidents</h2>
+    <div className="min-h-screen bg-grey-100">
+      {/* other bg things after forming the ui bg color and other things  */}
 
-      <div style={{ marginBottom: "10px" }}>
-        {/* Status Filter */}
-        <select value={statusFilter} onChange={handleStatusFilter}>
-          <option value="All">All Status</option>
-          <option value="active">Active</option>
-          <option value="resolved">Resolved</option>
-        </select>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
 
-        {/* Priority Filter */}
-        <select value={priorityFilter} onChange={handlePriorityFilter}>
-          <option value="All">All Priority</option>
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
-        </select>
-      </div>
-
-      {filteredIncidents.length === 0 ? (
-        <p>No incidents found</p>
-      ) : (
-        filteredIncidents.map((incident, index) => (
-          <div
-            key={incident._id || index}
-            style={{
-              border: "1px solid #ccc",
-              marginBottom: "10px",
-              padding: "10px",
-            }}
-          >
-            <h4>{incident.title}</h4>
-            <p>Status: {incident.status}</p>
-            <p>Priority: {incident.priority}</p>
-          </div>
-        ))
-      )}
-
-      <div>
-        <button
-          onClick={dbStore}
-          className="bg-purple-600 text-white p-2 rounded mb-4"
-        >
-          Seed DB
-        </button>
-      </div>
+        <Route
+          path="/report"
+          element={
+            <ProtectedRoute>
+              <IncidentForm />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
     </div>
   );
 }
