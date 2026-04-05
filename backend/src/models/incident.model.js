@@ -38,7 +38,6 @@ const incidentSchema = new mongoose.Schema(
     priority: {
       type: String,
       enum: ["low", "medium", "high"],
-      default: "medium",
       trim: true,
       lowercase: true,
     },

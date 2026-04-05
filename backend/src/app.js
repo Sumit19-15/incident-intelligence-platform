@@ -1,6 +1,10 @@
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
+
 import incidentRouter from "./routes/incident.routes.js";
+import authRouter from "./routes/auth.routes.js";
+
 import http from "http";
 import { Server } from "socket.io";
 
@@ -22,9 +26,11 @@ io.on("connection", (socket) => {
 
 app.use(express.json());
 app.use(cors());
+app.use(cookieParser());
 
 app.set("io", io);
 
 app.use("/api/incidents", incidentRouter);
+app.use("/api/auth", authRouter);
 
 export default server;
