@@ -1,126 +1,90 @@
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
-import axiosInstance from "../lib/axios.config";
 import { useState, useEffect } from "react";
-import socket from "../lib/socket.js";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
-function FlyToLocation({ position }) {
+// Fix for default Leaflet icons
+delete L.Icon.Default.prototype._getIconUrl;
+
+// Helper to create colored markers based on incident type
+const createCustomIcon = (type, isSelected) => {
+  const colors = {
+    fire: "#ef4444", // Red
+    theft: "#f59e0b", // Amber
+    accident: "#3b82f6", // Blue
+    default: "#6b7280", // Gray
+  };
+  const color = colors[type] || colors.default;
+
+  return L.divIcon({
+    className: "custom-marker",
+    html: `
+      <div style="
+        background-color: ${color};
+        width: ${isSelected ? "18px" : "14px"};
+        height: ${isSelected ? "18px" : "14px"};
+        border: 3px solid white;
+        border-radius: 50%;
+        box-shadow: 0 0 15px ${color};
+        transition: all 0.3s ease;
+      "></div>`,
+    iconSize: [20, 20],
+    iconAnchor: [10, 10],
+  });
+};
+
+function ChangeView({ center }) {
   const map = useMap();
-
-  useEffect(() => {
-    if (position) {
-      map.flyTo(position, 15, { duration: 1.5 });
-    }
-  }, [position, map]);
-
+  if (center) map.flyTo(center, 15, { duration: 1.5 });
   return null;
 }
 
-function MapView() {
-  const [incidents, setIncidents] = useState([]);
-  const [selectedPosition, setSelectedPosition] = useState(null);
-  const [userLocation, setUserLocation] = useState(null);
-
-  useEffect(() => {
-    const getAllIncidents = async () => {
-      try {
-        const res = await axiosInstance.get("/incidents");
-        setIncidents(res.data.incidents || []);
-      } catch (error) {
-        console.error("Error fetching incidents:", error);
-      }
-    };
-
-    getAllIncidents();
-  }, []);
-
-  useEffect(() => {
-    const handleCreate = (newIncident) => {
-      setIncidents((prev) => [newIncident, ...prev]);
-    };
-
-    const handleUpdate = (updatedIncident) => {
-      setIncidents((prev) =>
-        prev.map((item) =>
-          item._id === updatedIncident._id ? updatedIncident : item,
-        ),
-      );
-    };
-
-    const handleDelete = (deletedIncident) => {
-      setIncidents((prev) =>
-        prev.filter((item) => item._id !== deletedIncident._id),
-      );
-    };
-
-    socket.on("incidentCreated", handleCreate);
-    socket.on("incidentUpdated", handleUpdate);
-    socket.on("incidentDeleted", handleDelete);
-
-    return () => {
-      socket.off("incidentCreated", handleCreate);
-      socket.off("incidentUpdated", handleUpdate);
-      socket.off("incidentDeleted", handleDelete);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setUserLocation([pos.coords.latitude, pos.coords.longitude]);
-        },
-        (err) => {
-          console.log("Location access denied", err);
-        },
-      );
-    }
-  }, []);
+function MapView({ filteredData, activeId, setActiveId }) {
+  const [selectedPos, setSelectedPos] = useState(null);
 
   return (
-    <div className="h-[400px]" id="map">
-      <MapContainer
-        center={[28.6139, 77.209]}
-        zoom={13}
-        scrollWheelZoom={true}
-        style={{ height: "100%", width: "100%" }}
-      >
-        <TileLayer
-          attribution="&copy; OpenStreetMap contributors"
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+    <div className="relative w-full h-full flex items-center justify-center p-4">
+      {/* The Circular Wrapper */}
+      <div className="w-full aspect-square max-w-[500px] rounded-full overflow-hidden border-8 border-white shadow-2xl relative ring-4 ring-blue-500/20 animate-pulse-slow">
+        <MapContainer
+          center={[28.6139, 77.209]}
+          zoom={12}
+          zoomControl={false}
+          className="h-full w-full"
+        >
+          <TileLayer url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" />
 
-        {selectedPosition && <FlyToLocation position={selectedPosition} />}
+          <ChangeView center={selectedPos} />
 
-        {incidents.map((incident) => {
-          if (!incident.location?.lat || !incident.location?.lng) return null;
-
-          return (
+          {filteredData.map((incident) => (
             <Marker
               key={incident._id}
               position={[incident.location.lat, incident.location.lng]}
+              icon={createCustomIcon(incident.type, activeId === incident._id)}
               eventHandlers={{
                 click: () => {
-                  setSelectedPosition([
+                  setSelectedPos([
                     incident.location.lat,
                     incident.location.lng,
                   ]);
-                },
-                mouseover: (e) => {
-                  e.target.openPopup();
-                },
-                mouseout: (e) => {
-                  e.target.closePopup();
+                  setActiveId(incident._id);
                 },
               }}
             >
               <Popup>
-                <strong>{incident.title}</strong> <br />
-                Status: {incident.status}
+                <div className="p-1">
+                  <p className="font-bold text-blue-600 uppercase text-[10px]">
+                    {incident.type}
+                  </p>
+                  <p className="font-semibold text-gray-800">
+                    {incident.title}
+                  </p>
+                </div>
               </Popup>
             </Marker>
-          );
-        })}
-      </MapContainer>
+          ))}
+        </MapContainer>
+      </div>
     </div>
   );
 }

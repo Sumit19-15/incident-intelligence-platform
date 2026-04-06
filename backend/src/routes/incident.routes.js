@@ -4,9 +4,9 @@ import authMiddleware from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-router.post("/report", authMiddleware, incidentController.createIncident); // incident form route
-router.get("/", incidentController.getIncidents); // home route
-router.patch("/:id", incidentController.updateIncident);
-router.delete("/:id", incidentController.deleteIncident);
+router.get("/", incidentController.getIncidents);
+router.post("/report", authMiddleware, incidentController.createIncident);
+router.patch("/:id", authMiddleware, incidentController.updateIncident);
+router.delete("/:id", authMiddleware, incidentController.deleteIncident);
 
 export default router;
