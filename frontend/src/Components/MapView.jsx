@@ -2,11 +2,8 @@ import { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-
-// Fix for default Leaflet icons
 delete L.Icon.Default.prototype._getIconUrl;
 
-// Helper to create colored markers based on incident type
 const createCustomIcon = (type, isSelected) => {
   const colors = {
     fire: "#ef4444", // Red

@@ -3,11 +3,12 @@ import Home from "./pages/Home.jsx";
 import LoginPage from "./pages/Login.jsx";
 import RegisterPage from "./pages/Register.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
-import IncidentForm from "./pages/Report.jsx";
+import Report from "./pages/Report.jsx";
 import { useEffect } from "react";
 import { useAuthStore } from "./stores/useAuthStore.js";
 import { Toaster } from "react-hot-toast";
 import PageLoader from "./components/PageLoader.jsx";
+import Navbar from "./components/Navbar.jsx";
 
 function App() {
   const { checkAuth, isCheckingAuth } = useAuthStore();
@@ -22,7 +23,6 @@ function App() {
     <div className="min-h-screen bg-grey-100">
       {/* other bg things after forming the ui bg color and other things  */}
       <Toaster position="top-center" reverseOrder={false} />
-
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<LoginPage />} />
@@ -32,7 +32,7 @@ function App() {
           path="/report"
           element={
             <ProtectedRoute>
-              <IncidentForm />
+              <Report />
             </ProtectedRoute>
           }
         />

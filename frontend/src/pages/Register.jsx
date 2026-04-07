@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAuthStore } from "../stores/useAuthStore";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Mail, Lock, User, UserPlus, ArrowRight } from "lucide-react";
+import Navbar from "../components/Navbar";
 
 function RegisterPage() {
   const [formData, setFormData] = useState({
