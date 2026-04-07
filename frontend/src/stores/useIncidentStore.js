@@ -22,6 +22,10 @@ export const useIncidentStore = create((set, get) => ({
 
   // Centralized Socket Listeners
   subscribeToEvents: () => {
+    socket.off("incidentCreated");
+    socket.off("incidentUpdated");
+    socket.off("incidentDeleted");
+
     socket.on("incidentCreated", (newIncident) => {
       set((state) => ({ incidents: [newIncident, ...state.incidents] }));
 

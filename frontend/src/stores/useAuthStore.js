@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 export const useAuthStore = create((set) => ({
   user: null,
   token: localStorage.getItem("token") || "",
-  isAuthenticated: !!localStorage.getItem("token"),
+  isAuthenticated: false,
   isLoginLoading: false,
   isRegisterLoading: false,
   isCheckingAuth: true,
@@ -13,7 +13,8 @@ export const useAuthStore = create((set) => ({
   checkAuth: async () => {
     try {
       const res = await axiosInstance.get("/auth/check");
-      set({ user: res.data.user, isAuthenticated: true });
+      console.log(res.data);
+      set({ user: res.data, isAuthenticated: true });
     } catch (error) {
       set({ user: null, isAuthenticated: false, token: "" });
       localStorage.removeItem("token");

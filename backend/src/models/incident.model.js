@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 
 const incidentSchema = new mongoose.Schema(
   {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     title: {
       type: String,
       required: [true, "Title must be present for an Incident"],
@@ -40,6 +45,9 @@ const incidentSchema = new mongoose.Schema(
       enum: ["low", "medium", "high"],
       trim: true,
       lowercase: true,
+    },
+    image: {
+      type: String,
     },
   },
   {

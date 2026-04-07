@@ -1,6 +1,6 @@
 import { useState } from "react";
-import axiosInstance from "../services/axios.config";
-// 1. Added icon imports
+import { useIncidentStore } from "../stores/useIncidentStore";
+import { useNavigate } from "react-router-dom";
 import {
   AlertTriangle,
   FileText,
@@ -22,7 +22,9 @@ function IncidentForm() {
   });
 
   const [error, setError] = useState("");
+  const { reportIncident } = useIncidentStore();
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handelInputChange = (event) => {
     const { name, value } = event.target;
@@ -35,8 +37,6 @@ function IncidentForm() {
   const handelFormSubmit = async (event) => {
     event.preventDefault();
     if (loading) return;
-
-    // Validation logic (keeping your existing logic)
     if (
       !formData.title ||
       !formData.description ||
@@ -63,8 +63,8 @@ function IncidentForm() {
         priority: formData.priority,
       };
 
-      await axiosInstance.post("/incidents/report", requestBody);
-      alert("New incident is reported.");
+      await reportIncident(requestBody);
+      navigate("/");
 
       setFormData({
         title: "",

@@ -4,7 +4,7 @@ import authMiddleware from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-router.get("/", incidentController.getIncidents);
+router.get("/", authMiddleware, incidentController.getIncidents);
 router.post("/report", authMiddleware, incidentController.createIncident);
 router.patch("/:id", authMiddleware, incidentController.updateIncident);
 router.delete("/:id", authMiddleware, incidentController.deleteIncident);
