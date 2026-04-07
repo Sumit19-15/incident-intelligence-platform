@@ -1,10 +1,10 @@
 import { create } from "zustand";
 import axiosInstance from "../services/axios.config";
+import toast from "react-hot-toast";
 
 export const useAuthStore = create((set) => ({
   user: null,
   token: localStorage.getItem("token") || "",
-
   isAuthenticated: !!localStorage.getItem("token"),
   isLoginLoading: false,
   isRegisterLoading: false,
@@ -26,6 +26,7 @@ export const useAuthStore = create((set) => ({
     try {
       set({ isLoginLoading: true });
       const res = await axiosInstance.post("/auth/login", data);
+
       if (res.data.success) {
         set({
           user: res.data.user,
@@ -33,9 +34,13 @@ export const useAuthStore = create((set) => ({
           isAuthenticated: true,
         });
         localStorage.setItem("token", res.data.token);
+        toast.success(`Welcome back, ${res.data.user.name}!`);
+        return true;
       }
+      return false;
     } catch (error) {
-      alert(error.response?.data?.message || "Login failed");
+      toast.error(error.response?.data?.message || "Login failed");
+      return false;
     } finally {
       set({ isLoginLoading: false });
     }
@@ -45,6 +50,7 @@ export const useAuthStore = create((set) => ({
     try {
       set({ isRegisterLoading: true });
       const res = await axiosInstance.post("/auth/register", data);
+
       if (res.data.success) {
         set({
           user: res.data.user,
@@ -52,9 +58,13 @@ export const useAuthStore = create((set) => ({
           isAuthenticated: true,
         });
         localStorage.setItem("token", res.data.token);
+        toast.success("Account created successfully!");
+        return true;
       }
+      return false;
     } catch (error) {
-      alert(error.response?.data?.message || "Registration failed");
+      toast.error(error.response?.data?.message || "Registration failed");
+      return false;
     } finally {
       set({ isRegisterLoading: false });
     }
@@ -65,6 +75,7 @@ export const useAuthStore = create((set) => ({
       await axiosInstance.post("/auth/logout");
       set({ user: null, token: "", isAuthenticated: false });
       localStorage.removeItem("token");
+      toast.success("Logged out successfully");
     } catch (error) {
       console.error("Logout failed", error);
       set({ user: null, token: "", isAuthenticated: false });

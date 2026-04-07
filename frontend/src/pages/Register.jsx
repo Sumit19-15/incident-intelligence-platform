@@ -16,10 +16,12 @@ function RegisterPage() {
 
   const handelSubmit = async (event) => {
     event.preventDefault();
-    await register(formData);
+    const success = await register(formData);
 
-    const origin = location.state?.from?.pathname || "/";
-    navigate(origin, { replace: true });
+    if (success) {
+      const origin = location.state?.from?.pathname || "/";
+      navigate(origin, { replace: true });
+    }
   };
 
   const handelInputChange = (event) => {

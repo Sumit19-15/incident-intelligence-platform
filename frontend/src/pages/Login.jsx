@@ -12,10 +12,12 @@ function LoginPage() {
 
   const handelSubmit = async (event) => {
     event.preventDefault();
-    await login(formData);
+    const success = await login(formData);
 
-    const origin = location.state?.from?.pathname || "/";
-    navigate(origin, { replace: true });
+    if (success) {
+      const origin = location.state?.from?.pathname || "/";
+      navigate(origin, { replace: true });
+    }
   };
 
   const handelInputChange = (event) => {

@@ -6,6 +6,8 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import IncidentForm from "./pages/Report.jsx";
 import { useEffect } from "react";
 import { useAuthStore } from "./stores/useAuthStore.js";
+import { Toaster } from "react-hot-toast";
+import PageLoader from "./components/PageLoader.jsx";
 
 function App() {
   const { checkAuth, isCheckingAuth } = useAuthStore();
@@ -14,15 +16,12 @@ function App() {
   }, [checkAuth]);
 
   if (isCheckingAuth) {
-    return (
-      <div className="h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-blue-600"></div>
-      </div>
-    );
+    return <PageLoader></PageLoader>;
   }
   return (
     <div className="min-h-screen bg-grey-100">
       {/* other bg things after forming the ui bg color and other things  */}
+      <Toaster position="top-center" reverseOrder={false} />
 
       <Routes>
         <Route path="/" element={<Home />} />
